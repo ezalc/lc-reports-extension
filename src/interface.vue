@@ -20,8 +20,8 @@ import { createDeliveryOrderData, createSummaryReportData, createNonMovementRepo
 const reportName = {
 	"non-movement": "Non-movement report",
 	"billing": "Billing report",
-	"delivery-order": "Delivery order",
-	"daily-summary": "Daily summary",
+	"delivery-order": "Delivery order report",
+	"daily-summary": "Daily summary report",
 };
 
 export default defineComponent({
@@ -46,23 +46,27 @@ export default defineComponent({
 		const isLoading = ref(false);
 		const { t } = useI18n();
 
-		const { label, reportType, value } = props;
+		const { label } = props;
 
 		return {
 			isLoading,
 			label: label,
 			async click() {
+				const { reportType, value } = props;
+				
 				isLoading.value = true;
 
 				try {
+					const { name } = value;
+					
 					const pdf = (reportType === 'non-movement') ? 
-						await generateNonMovementReportPdf(createNonMovementReportData(JSON.parse(value)))
+						await generateNonMovementReportPdf(createNonMovementReportData(value))
 					: (reportType === 'billing' ) ?
-						await generateSummaryReportPdf(createSummaryReportData(JSON.parse(value)))
+						await generateSummaryReportPdf(createSummaryReportData(value))
 					: (reportType === 'delivery-order' ) ?
-						await generateDeliveryOrderPdf(createDeliveryOrderData(JSON.parse(value)))
+						await generateDeliveryOrderPdf(createDeliveryOrderData(value))
 					: (reportType === 'daily-summary' ) ?
-						await generateDailyReportPdf(createDailyReportData(JSON.parse(value)))
+						await generateDailyReportPdf(createDailyReportData(value))
 					: (() => {throw new Error ('Invalid reportType');})()
 						;
 
@@ -71,7 +75,7 @@ export default defineComponent({
 						type: 'success',
 						dialog: true,
 						dismissText: 'Download',
-						dismissAction: () => {downloadPdf(pdf, 'my-name.pdf');}
+						dismissAction: () => {downloadPdf(pdf, `${name}.pdf`);}
 					});
 				} catch (e) {
 					store.add({
