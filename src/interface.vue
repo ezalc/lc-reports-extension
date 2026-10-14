@@ -15,13 +15,15 @@ import { defineComponent, ref } from "vue";
 import { useStores } from "@directus/extensions-sdk";
 import { render } from "micromustache";
 import { useI18n } from "vue-i18n";
-import { createDeliveryOrderData, createSummaryReportData, createNonMovementReportData, createDailyReportData, generateDeliveryOrderPdf, generateSummaryReportPdf, generateNonMovementReportPdf, generateDailyReportPdf, downloadPdf } from "./pdf-generator";
+import { createDeliveryOrderData, createSummaryReportData, createNonMovementReportData, createDailyReportData, createRewashReportData, createWeightSummaryReportData, generateDeliveryOrderPdf, generateSummaryReportPdf, generateNonMovementReportPdf, generateDailyReportPdf, generateRewashReportPdf, generateWeightSummaryReportPdf, downloadPdf } from "./pdf-generator";
 
 const reportName = {
 	"non-movement": "Non-movement report",
 	"billing": "Billing report",
 	"delivery-order": "Delivery order report",
 	"daily-summary": "Daily summary report",
+	"rewash-report": "Rewash report",
+	"weight-summary": "Weight summary report",
 };
 
 export default defineComponent({
@@ -67,6 +69,10 @@ export default defineComponent({
 						await generateDeliveryOrderPdf(createDeliveryOrderData(value))
 					: (reportType === 'daily-summary' ) ?
 						await generateDailyReportPdf(createDailyReportData(value))
+					: (reportType === 'rewash-report' ) ?
+						await generateRewashReportPdf(createRewashReportData(value))
+					: (reportType === 'weight-summary' ) ?
+						await generateWeightSummaryReportPdf(createWeightSummaryReportData(value))
 					: (() => {throw new Error ('Invalid reportType');})()
 						;
 
