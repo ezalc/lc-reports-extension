@@ -15,15 +15,16 @@ import { defineComponent, ref } from "vue";
 import { useStores } from "@directus/extensions-sdk";
 import { render } from "micromustache";
 import { useI18n } from "vue-i18n";
-import { createDeliveryOrderData, createSummaryReportData, createNonMovementReportData, createDailyReportData, createRewashReportData, createWeightSummaryReportData, generateDeliveryOrderPdf, generateSummaryReportPdf, generateNonMovementReportPdf, generateDailyReportPdf, generateRewashReportPdf, generateWeightSummaryReportPdf, downloadPdf } from "./pdf-generator";
+import { createDeliveryOrderData, createSummaryReportData, createNonMovementReportData, createDailyReportData, createRewashReportData, createWeightSummaryReportData, generateDeliveryOrderPdf, generateSummaryReportPdf, generateNonMovementReportPdf, generateDailyReportPdf, generateRewashReportPdf, generateWeightSummaryReportPdf, generateLinenDeliveryOrdersPdf, downloadPdf } from "./pdf-generator";
 
 const reportName = {
 	"non-movement": "Non-movement report",
 	"billing": "Billing report",
 	"delivery-order": "Delivery order report",
 	"daily-summary": "Daily summary report",
+	"service-summary": "Service summary",
 	"rewash-report": "Rewash report",
-	"weight-summary": "Weight summary report",
+	"weight-summary": "Weight summary",
 };
 
 export default defineComponent({
@@ -69,6 +70,8 @@ export default defineComponent({
 						await generateDeliveryOrderPdf(createDeliveryOrderData(value))
 					: (reportType === 'daily-summary' ) ?
 						await generateDailyReportPdf(createDailyReportData(value))
+					: (reportType === 'service-summary' ) ?
+						await generateLinenDeliveryOrdersPdf(value)
 					: (reportType === 'rewash-report' ) ?
 						await generateRewashReportPdf(createRewashReportData(value))
 					: (reportType === 'weight-summary' ) ?
