@@ -22,8 +22,9 @@ const reportName = {
 	"billing": "Billing report",
 	"delivery-order": "Delivery order report",
 	"daily-summary": "Daily summary report",
+	"service-summary": "Service summary",
 	"rewash-report": "Rewash report",
-	"weight-summary": "Weight summary report",
+	"weight-summary": "Weight summary",
 };
 
 export default defineComponent({
@@ -69,6 +70,8 @@ export default defineComponent({
 						await generateDeliveryOrderPdf(createDeliveryOrderData(value))
 					: (reportType === 'daily-summary' ) ?
 						await generateDailyReportPdf(createDailyReportData(value))
+					: (reportType === 'service-summary' ) ?
+						await generateLinenDeliveryOrdersPdf(createLinenDeliveryOrdersData(value))
 					: (reportType === 'rewash-report' ) ?
 						await generateRewashReportPdf(createRewashReportData(value))
 					: (reportType === 'weight-summary' ) ?
