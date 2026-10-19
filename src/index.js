@@ -18,6 +18,15 @@ export default {
 			},
 		},
 		{
+			field: "csvLabel",
+			type: "string",
+			name: "$t:export_items",
+			meta: {
+				width: "full",
+				interface: "text",
+			},
+		},
+		{
 			field: "reportType",
 			name: "Report Type",
 			type: "string",
