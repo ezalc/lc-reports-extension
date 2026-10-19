@@ -32,7 +32,7 @@ export default {
 						{ text: "Delivery order", value: "delivery-order" },
 						{ text: "Daily summary", value: "daily-summary" },
 						{ text: "Service summary", value: "service-summary" },
-						{ text: "Rewash report", value: "rewash-report" },
+						{ text: "Movement summary report", value: "movement-summary" },
 						{ text: "Weight summary", value: "weight-summary" },
 					],
 				},
