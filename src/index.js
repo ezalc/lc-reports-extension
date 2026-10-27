@@ -1,4 +1,5 @@
 import InterfaceComponent from "./interface.vue";
+import { REPORT_NAMES } from "./reports";
 
 export default {
 	id: "lc-report",
@@ -26,15 +27,7 @@ export default {
 				interface: "select-dropdown",
 				required: true,
 				options: {
-					choices: [
-						{ text: "Non-movement report", value: "non-movement" },
-						{ text: "Billing report", value: "billing" },
-						{ text: "Delivery order", value: "delivery-order" },
-						{ text: "Daily summary", value: "daily-summary" },
-						{ text: "Service summary", value: "service-summary" },
-						{ text: "Movement summary report", value: "movement-summary" },
-						{ text: "Weight summary", value: "weight-summary" },
-					],
+					choices: Object.entries(REPORT_NAMES).map(([value, text]) => ({ text, value })),
 				},
 			},
 		},
