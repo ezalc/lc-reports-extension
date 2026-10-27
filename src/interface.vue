@@ -9,11 +9,6 @@
 		<v-dialog v-model="isDialogOpen" @esc="closeDialog" persistent>
 			<v-card class="lc-report-card">
 				<v-card-title>{{ title }}</v-card-title>
-				<v-card-text>
-					<p v-for="format in formats" :key="format.name">
-						<strong>{{ format.name }}:</strong> {{ format.hint }}
-					</p>
-				</v-card-text>
 				<div class="lc-report-actions">
 					<v-button
 						secondary
@@ -41,14 +36,12 @@
 import { defineComponent, ref } from "vue";
 import { useStores } from "@directus/extensions-sdk";
 import { exportPdf } from "./export-pdf";
-import { exportCsv } from "./export-csv";
 import { exportExcel } from "./export-excel";
 import { REPORT_NAMES, downloadBlob } from "./reports";
 
 const formats = [
-	{ name: 'PDF', hint: 'print-ready document.', export: exportPdf, extension: 'pdf' },
-	{ name: 'CSV', hint: 'plain data in the same cell positions, no styling.', export: exportCsv, extension: 'csv' },
-	{ name: 'Excel', hint: 'same layout, fonts and colours as the PDF.', export: exportExcel, extension: 'xlsx' },
+	{ name: 'PDF', export: exportPdf, extension: 'pdf' },
+	{ name: 'Excel', export: exportExcel, extension: 'xlsx' },
 ];
 
 export default defineComponent({

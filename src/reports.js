@@ -1,4 +1,4 @@
-// Shared by the PDF, CSV and Excel exporters.
+// Shared by the PDF and Excel exporters.
 
 export const REPORT_NAMES = {
 	"delivery-order": "Delivery order report",
@@ -358,7 +358,7 @@ export function normalizeWeightSummary(data = {}) {
 	};
 }
 
-// ---- table rows (display text, the same in the PDF, CSV and Excel) ----
+// ---- table rows (display text, the same in the PDF and Excel) ----
 
 export const deliveryItemCells = (item, index) => [
 	index + 1,
