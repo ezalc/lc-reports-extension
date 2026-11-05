@@ -1,5 +1,5 @@
 import InterfaceComponent from "./interface.vue";
-import { REPORT_NAMES } from "./reports";
+import { REPORT_NAMES } from "./export";
 
 export default {
 	id: "lc-report",

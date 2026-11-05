@@ -35,9 +35,7 @@
 <script>
 import { defineComponent, ref } from "vue";
 import { useStores } from "@directus/extensions-sdk";
-import { exportPdf } from "./export-pdf";
-import { exportExcel } from "./export-excel";
-import { REPORT_NAMES, downloadBlob } from "./reports";
+import { REPORT_NAMES, downloadBlob, exportExcel, exportPdf } from "./export";
 
 const formats = [
 	{ name: 'PDF', export: exportPdf, extension: 'pdf' },
