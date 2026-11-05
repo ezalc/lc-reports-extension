@@ -2,6 +2,7 @@ import {
 	createDailyReportData,
 	createDeliveryOrderData,
 	createNonMovementReportData,
+	createQcReportData,
 	createRewashReportData,
 	createSummaryReportData,
 	createWeightSummaryReportData,
@@ -9,6 +10,7 @@ import {
 	generateDeliveryOrderPdf,
 	generateLinenDeliveryOrdersPdf,
 	generateNonMovementReportPdf,
+	generateQcReportPdf,
 	generateRewashReportPdf,
 	generateSummaryReportPdf,
 	generateWeightSummaryReportPdf,
@@ -24,6 +26,7 @@ const PDF_REPORTS = {
 	"service-summary": { createData: (value) => value, generate: generateLinenDeliveryOrdersPdf },
 	"movement-summary": { createData: createRewashReportData, generate: generateRewashReportPdf },
 	"weight-summary": { createData: createWeightSummaryReportData, generate: generateWeightSummaryReportPdf },
+	"qc": { createData: createQcReportData, generate: generateQcReportPdf },
 };
 
 export async function exportPdf(reportType, value) {
@@ -44,6 +47,7 @@ export const REPORT_NAMES = {
 	"service-summary": "Service summary",
 	"movement-summary": "Movement summary report",
 	"weight-summary": "Weight summary",
+	"qc": "QC report",
 };
 
 export function downloadBlob(blob, filename) {

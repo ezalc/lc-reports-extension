@@ -3,6 +3,7 @@ import {
 	createDailyReportData,
 	createDeliveryOrderData,
 	createNonMovementReportData,
+	createQcReportData,
 	createRewashReportData,
 	createSummaryReportData,
 	createWeightSummaryReportData,
@@ -677,7 +678,7 @@ function writeWorksheet(layout) {
 			orientation: layout.orientation,
 			fitToPage: true,
 			fitToWidth: 1,
-			fitToHeight: 0,
+			fitToHeight: layout.fitToHeight ?? 0,
 			margins: {
 				left: layout.margins.left / 72,
 				right: layout.margins.right / 72,
@@ -730,6 +731,7 @@ function writeWorksheet(layout) {
 				horizontal: cell.align ?? "left",
 				vertical: cell.valign ?? "top",
 				wrapText: cell.wrap ?? true,
+				textRotation: cell.rotate ?? 0,
 				indent: cell.indent ?? 0,
 			};
 			if (cell.fill) target.fill = { type: "pattern", pattern: "solid", fgColor: toArgb(cell.fill) };
@@ -1378,6 +1380,102 @@ function weightSummaryLayout(data = {}) {
 	};
 }
 
+// ---- qc torn and discard ----
+
+// Sheet is about as wide as the A4 landscape page is, so one page print fills the width
+const QC_WIDTHS = { number: 24, item: 130, kind: 48, day: 26, total: 40 };
+const QC_ROW_HEIGHT = 12;
+
+// Totals come from the data, nothing is summed here
+function normalizeQc(data = {}) {
+	const days = asArray(data.days);
+	const countsOf = (values) => days.map((_, index) => toNumber(asArray(values)[index]));
+	const startDate = toDate(data.date);
+	return {
+		reportTitle: data.reportTitle ?? "LC TORN & DISCARD",
+		dateText: startDate
+			? `${startDate.getDate()} ${startDate.toLocaleString("en-GB", { month: "long" })}, ${startDate.getFullYear()}`
+			: "",
+		dayLabels: days.map((day) => {
+			const date = toDate(day);
+			return date ? `${date.getDate()}-${MONTH_NAMES[date.getMonth()]}-${String(date.getFullYear()).slice(-2)}` : "-";
+		}),
+		rows: asArray(data.items).map((item) => ({
+			item: item.item ?? "-",
+			torn: countsOf(item.torn),
+			discard: countsOf(item.discard),
+			total: toNumber(item.total),
+		})),
+		totalPerDay: countsOf(data.totalPerDay),
+		total: toNumber(data.total),
+	};
+}
+
+function qcLayout(data = {}) {
+	const report = normalizeQc(data);
+	const palette = BASE_PALETTE;
+	const margins = { top: 28, right: 24, bottom: 28, left: 24 };
+	const { number, item, kind, day, total } = QC_WIDTHS;
+	const dayColumns = report.dayLabels.length;
+	const contentWidth = number + item + kind + day * dayColumns + total;
+	const dayX = (index) => number + item + kind + day * index;
+	const totalX = dayX(dayColumns);
+	const cell = (x, width, text, style = {}) =>
+		block(x, width, text, { size: 8, align: "center", valign: "middle", color: palette.ink, border: palette.line, ...style });
+	const header = { bold: true, fill: palette.header };
+	const tornStyle = { fill: palette.soft };
+	const itemRows = report.rows.flatMap((row, index) => [
+		{
+			height: QC_ROW_HEIGHT,
+			cells: [
+				cell(0, number, index + 1, { rowSpan: 2 }),
+				cell(number, item, row.item, { rowSpan: 2 }),
+				cell(number + item, kind, "TORN", { ...tornStyle, bold: true }),
+				...row.torn.map((value, dayIndex) => cell(dayX(dayIndex), day, value || "", tornStyle)),
+				cell(totalX, total, row.total, { rowSpan: 2, bold: true, size: 10, color: palette.brand }),
+			],
+		},
+		{
+			height: QC_ROW_HEIGHT,
+			cells: [
+				cell(number + item, kind, "DISCARD", { bold: true }),
+				...row.discard.map((value, dayIndex) => cell(dayX(dayIndex), day, value || "")),
+			],
+		},
+	]);
+
+	return {
+		orientation: "landscape",
+		// Prints on one page
+		fitToHeight: 1,
+		margins,
+		rows: [
+			textRow(22, contentWidth, report.reportTitle, { size: 16, bold: true, color: palette.ink }),
+			...(report.dateText ? [textRow(16, contentWidth, report.dateText, { size: 11, bold: true, color: palette.ink })] : []),
+			spacer(8),
+			{
+				height: 48,
+				cells: [
+					cell(0, number, "NO", header),
+					cell(number, item, "ITEM", header),
+					cell(number + item, kind, "", header),
+					...report.dayLabels.map((label, dayIndex) => cell(dayX(dayIndex), day, label, { ...header, size: 8, rotate: 90, wrap: false })),
+					cell(totalX, total, "TOTAL", header),
+				],
+			},
+			...itemRows,
+			{
+				height: QC_ROW_HEIGHT,
+				cells: [
+					cell(0, number + item + kind, "TOTAL", header),
+					...report.totalPerDay.map((value, dayIndex) => cell(dayX(dayIndex), day, value, header)),
+					cell(totalX, total, report.total, header),
+				],
+			},
+		],
+	};
+}
+
 // ---- entry point ----
 
 const layoutBuilders = {
@@ -1388,6 +1486,7 @@ const layoutBuilders = {
 	"service-summary": (value) => serviceSummaryLayout(value),
 	"movement-summary": (value) => movementSummaryLayout(createRewashReportData(value)),
 	"weight-summary": (value) => weightSummaryLayout(createWeightSummaryReportData(value)),
+	"qc": (value) => qcLayout(createQcReportData(value)),
 };
 
 function createExcelLayout(reportType, value) {
